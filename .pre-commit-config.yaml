@@ -14,4 +14,4 @@ repos:
     -   id: cpplint
         args: ["--filter=-legal/copyright,-build/include_order"]
     -   id: cppcheck
-        args: ["--inline-suppr"]
+        args: ["--inline-suppr", "--library=boost"]

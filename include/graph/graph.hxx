@@ -3,22 +3,24 @@
 
 #include <list>
 #include <map>
-#include <memory>
+#include <vector>
 
 using std::list;
-using std::make_shared;
 using std::map;
-using std::shared_ptr;
+using std::vector;
 
 class Graph {
  public:
   // NOTE: We need to initialize the shared pointer in order not to get segfault
-  Graph() : adjacency_list(make_shared<map<int, list<int>>>()) {}
+  Graph() {}
   void AddEdge(int, int);
+  void AddDiEdge(int, int);
   const list<int> GetAdjacencyList(int) const;
-  // void DFS(int from);
+  list<int> DFS(int);
+
  private:
-  shared_ptr<map<int, list<int>>> adjacency_list;
+  map<int, list<int>> adjacency_map;
+  void DFSRecurser(int, map<int, bool>*, list<int>*);
 };
 
 #endif  // INCLUDE_GRAPH_GRAPH_HXX_
