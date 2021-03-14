@@ -3,6 +3,8 @@
 
 #include "graph/graph.hxx"
 
+using std::list;
+
 BOOST_AUTO_TEST_SUITE(DFSSimple)
 
 BOOST_AUTO_TEST_CASE(dfs_simple) {

@@ -28,5 +28,12 @@ int main() {
     cout << el << endl;
   }
 
+  auto cyclic = g.IsCyclic();
+  cout << "The graph is " << (cyclic ? "" : "not ") << "cyclic" << endl;
+
+  auto cycles = g.GetCycles();
+  cout << "The graph contains " << (*cycles.begin()).size() << " cycles"
+       << endl;
+
   return 0;
 }
