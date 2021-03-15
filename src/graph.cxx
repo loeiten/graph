@@ -25,7 +25,14 @@ const list<int> Graph::GetAdjacencyList(int node) const {
   return adjacency_map.at(node);
 }
 
-list<int> Graph::DFS(int from) {
+bool Graph::IsLeaf(int node) const {
+  if (adjacency_map.find(node) == adjacency_map.end()) {
+    return true;
+  }
+  return false;
+}
+
+list<int> Graph::DFS(int from) const {
   // NOTE: The following must only be declared once
   map<int, bool> visited_map;
   for (auto& cur_pair : adjacency_map) {
@@ -43,12 +50,17 @@ list<int> Graph::DFS(int from) {
 }
 
 void Graph::DFSRecurser(int node, map<int, bool>* visited_map_ptr,
-                        list<int>* result_ptr) {
+                        list<int>* result_ptr) const {
   // The node is now visited
   (*visited_map_ptr)[node] = true;
 
+  // Leave if leaf node
+  if (IsLeaf(node)) {
+    return;
+  }
   // Loop through all the adjacent nodes of the current node
-  for (const auto& neighbour_node : adjacency_map[node]) {
+  // Note operator[] is not supported for constant map
+  for (const auto& neighbour_node : adjacency_map.at(node)) {
     // Check if the neighbour_node exists in the visited_map
     if (!(*visited_map_ptr)[neighbour_node]) {
       // If it is not visited, visit it
@@ -60,7 +72,7 @@ void Graph::DFSRecurser(int node, map<int, bool>* visited_map_ptr,
 }
 
 // NOTE: Some duplication of DFS, maybe better way to reuse code?
-bool Graph::IsCyclic() {
+bool Graph::IsCyclic() const {
   // NOTE: The following must only be declared once
   map<int, bool> visited_map;
   for (auto& cur_pair : adjacency_map) {
@@ -78,7 +90,8 @@ bool Graph::IsCyclic() {
 }
 
 void Graph::CyclicRecurser(int node, int prev_node,
-                           map<int, bool>* visited_map_ptr, bool* cyclic_ptr) {
+                           map<int, bool>* visited_map_ptr,
+                           bool* cyclic_ptr) const {
   if (*cyclic_ptr) {
     // Cycle found, no need to continue
     return;
@@ -86,8 +99,12 @@ void Graph::CyclicRecurser(int node, int prev_node,
   // The node is now visited
   (*visited_map_ptr)[node] = true;
 
+  // Leave if leaf node
+  if (IsLeaf(node)) {
+    return;
+  }
   // Loop through all the adjacent nodes of the current node
-  for (const auto& neighbour_node : adjacency_map[node]) {
+  for (const auto& neighbour_node : adjacency_map.at(node)) {
     // Check if the neighbour_node exists in the visited_map
     if (!(*visited_map_ptr)[neighbour_node]) {
       // If it is not visited, visit it
@@ -104,7 +121,7 @@ void Graph::CyclicRecurser(int node, int prev_node,
 }
 
 // NOTE: Some duplication of IsCyclic, maybe better way to reuse code?
-set<set<int>> Graph::GetCycles() {
+set<set<int>> Graph::GetCycles() const {
   // NOTE: The following must only be declared once
   map<int, bool> visited_map;
   for (auto& cur_pair : adjacency_map) {
@@ -134,12 +151,16 @@ set<set<int>> Graph::GetCycles() {
 
 void Graph::GetCyclcesRecurser(int node, int prev_node,
                                map<int, bool>* visited_map_ptr,
-                               set<int>* cycle_start_ptr) {
+                               set<int>* cycle_start_ptr) const {
   // The node is now visited
   (*visited_map_ptr)[node] = true;
 
+  // Leave if leaf node
+  if (IsLeaf(node)) {
+    return;
+  }
   // Loop through all the adjacent nodes of the current node
-  for (const auto& neighbour_node : adjacency_map[node]) {
+  for (const auto& neighbour_node : adjacency_map.at(node)) {
     // Check if the neighbour_node exists in the visited_map
     if (!(*visited_map_ptr)[neighbour_node]) {
       // If it is not visited, visit it
@@ -156,12 +177,16 @@ void Graph::GetCyclcesRecurser(int node, int prev_node,
 }
 
 void Graph::TraceCycle(int node, int prev_node, deque<int>* visited_ptr,
-                       set<set<int>>* cycles_ptr) {
+                       set<set<int>>* cycles_ptr) const {
   // Add current node to the deque
   visited_ptr->push_back(node);
 
+  // Leave if leaf node
+  if (IsLeaf(node)) {
+    return;
+  }
   // Loop through all the adjacent nodes of the current node
-  for (const auto& neighbour_node : adjacency_map[node]) {
+  for (const auto& neighbour_node : adjacency_map.at(node)) {
     // Check if the neighbour_node exists in the visited_map
     if (find(visited_ptr->cbegin(), visited_ptr->cend(), neighbour_node) ==
         visited_ptr->cend()) {
@@ -171,10 +196,13 @@ void Graph::TraceCycle(int node, int prev_node, deque<int>* visited_ptr,
       // Need to check if we just came from the node (in that case it has of
       // course been visited)
 
-      // Cycle found, add to cycles start
-      set<int> cycle;
-      for (const auto& el : *visited_ptr) {
-        cycle.insert(el);
+      // Cycle found, start by adding the node where the cycle was found
+      set<int> cycle{neighbour_node};
+      // Reverse traverse until the area of locus (i.e. the node where the cycle
+      // was found)
+      for (auto current_node_it = visited_ptr->rbegin();
+           *current_node_it != neighbour_node; ++current_node_it) {
+        cycle.insert(*current_node_it);
       }
       cycles_ptr->insert(cycle);
     }

@@ -1,3 +1,3 @@
 # Graph
 
-Implementation freely after GeeksforGeeks [DFS for a Graph](https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/)
+Naive implementation of a graph which can do DFS, find cycles and distances between nodes and cycles.

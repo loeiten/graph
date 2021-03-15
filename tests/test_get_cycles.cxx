@@ -105,12 +105,6 @@ BOOST_AUTO_TEST_CASE(get_cycles_cg) {
   BOOST_TEST(g.GetCycles() == (set<set<int>>{set<int>{0, 1, 2}}));
 }
 
-// DELME
-// FIXME: You are here: Also test cycle with leaf nodes
-#include <iostream>
-using std::cout;
-using std::endl;
-
 BOOST_AUTO_TEST_CASE(get_cycles_cg_big) {
   Graph g;
   g.AddEdge(0, 1);
@@ -124,27 +118,36 @@ BOOST_AUTO_TEST_CASE(get_cycles_cg_big) {
   g.AddEdge(4, 5);
   g.AddEdge(5, 3);
 
-  // DELME
-  auto foo = g.GetCycles();
-  for (const auto& cycle : foo) {
-    cout << "{";
-    for (const auto& node : cycle) {
-      cout << node << ", ";
-    }
-    cout << "}" << endl;
-  }
+  BOOST_TEST(g.GetCycles() ==
+             (set<set<int>>{set<int>{0, 1, 2}, set<int>{0, 1, 2, 3},
+                            set<int>{0, 2, 3}, set<int>{3, 4, 5}}));
+}
 
-  BOOST_TEST(
-      g.GetCycles() ==
-      (set<set<int>>{set<int>{0, 1, 2}, set<int>{0, 1, 2, 3},
-                     // set<int>{0, 1, 2, 3, 4, 5},  // 3 is a locus
-                     // set<int>{0, 1, 2, 3, 5},  // Ends in a non-closed loop
-                     set<int>{0, 2, 3},
-                     // set<int>{0, 2, 3, 4, 5},  // 3 is a locus
-                     // set<int>{0, 2, 3, 5},  // Ends in a non-closed loop
-                     // set<int>{0, 3, 4, 5},  // Begins with a non-closed loop
-                     // set<int>{2, 3, 4, 5},  // 3 is a locus
-                     set<int>{3, 4, 5}}));
+BOOST_AUTO_TEST_CASE(get_cycles_cg_big_with_leaves) {
+  Graph g;
+  g.AddEdge(0, 1);
+  g.AddEdge(1, 2);
+  g.AddEdge(2, 0);
+
+  g.AddEdge(0, 3);
+  g.AddEdge(3, 2);
+
+  g.AddEdge(3, 4);
+  g.AddEdge(4, 5);
+  g.AddEdge(5, 3);
+
+  // Add a subtree with two leaf nodes
+  g.AddEdge(5, 6);
+  g.AddEdge(6, 7);
+  g.AddEdge(6, 8);
+  g.AddEdge(8, 9);
+
+  // Add another leaf node
+  g.AddEdge(1, 10);
+
+  BOOST_TEST(g.GetCycles() ==
+             (set<set<int>>{set<int>{0, 1, 2}, set<int>{0, 1, 2, 3},
+                            set<int>{0, 2, 3}, set<int>{3, 4, 5}}));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
