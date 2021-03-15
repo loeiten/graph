@@ -62,6 +62,25 @@ class Graph {
   list<int> DFS(int from) const;
 
   /**
+   * Do a breadth first search
+   *
+   * \param from Node to start the search from
+   * \return A list of int containing the result of the search
+   */
+  list<int> BFS(int from) const;
+
+  /**
+   * Find shortest path in unweighted graph
+   *
+   * Returns -1 if node is not found
+   *
+   * \param from Node to start the search from
+   * \param to Node to end the search at
+   * \return The distance between the input
+   */
+  int Distance(int from, int to) const;
+
+  /**
    * Checks if a graph is cyclic
    *
    * \return true if the graph contains at least one cycle

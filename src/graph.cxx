@@ -71,6 +71,76 @@ void Graph::DFSRecurser(int node, map<int, bool>* visited_map_ptr,
   }
 }
 
+list<int> Graph::BFS(int from) const {
+  // NOTE: The following must only be declared once
+  map<int, bool> visited_map;
+  for (auto& cur_pair : adjacency_map) {
+    visited_map[cur_pair.first] = false;
+  }
+
+  // NOTE: We add the starting node and mark it as visited
+  list<int> result{from};
+  visited_map[from] = true;
+  deque<int> bfs_queue;
+  bfs_queue.push_back(from);
+
+  while (!bfs_queue.empty()) {
+    int cur_node = bfs_queue.back();
+    bfs_queue.pop_back();
+    // Continue if leaf node
+    if (IsLeaf(cur_node)) {
+      continue;
+    }
+    for (const auto& neighbour_node : adjacency_map.at(cur_node)) {
+      if (!visited_map[neighbour_node]) {
+        visited_map[neighbour_node] = true;
+        result.push_back(neighbour_node);
+        bfs_queue.push_back(neighbour_node);
+      }
+    }
+  }
+  return result;
+}
+
+int Graph::Distance(int from, int to) const {
+  int distance = 0;
+  map<int, bool> visited_map;
+  for (auto& cur_pair : adjacency_map) {
+    visited_map[cur_pair.first] = false;
+  }
+
+  // NOTE: We add the starting node and mark it as visited
+  visited_map[from] = true;
+  deque<int> bfs_queue;
+  bfs_queue.push_back(from);
+
+  while (!bfs_queue.empty()) {
+    int cur_node = bfs_queue.back();
+
+    if (cur_node == to) {
+      return distance;
+    }
+
+    bfs_queue.pop_back();
+    // FIXME: You are here - in digraph a leaf is only pointing back at prev
+    // Continue if leaf node
+    if (IsLeaf(cur_node)) {
+      continue;
+    }
+
+    // Increase the distance
+    ++distance;
+
+    for (const auto& neighbour_node : adjacency_map.at(cur_node)) {
+      if (!visited_map[neighbour_node]) {
+        visited_map[neighbour_node] = true;
+        bfs_queue.push_back(neighbour_node);
+      }
+    }
+  }
+  return -1;
+}
+
 // NOTE: Some duplication of DFS, maybe better way to reuse code?
 bool Graph::IsCyclic() const {
   // NOTE: The following must only be declared once
@@ -198,8 +268,8 @@ void Graph::TraceCycle(int node, int prev_node, deque<int>* visited_ptr,
 
       // Cycle found, start by adding the node where the cycle was found
       set<int> cycle{neighbour_node};
-      // Reverse traverse until the area of locus (i.e. the node where the cycle
-      // was found)
+      // Reverse traverse until the area of locus (i.e. the node where the
+      // cycle was found)
       for (auto current_node_it = visited_ptr->rbegin();
            *current_node_it != neighbour_node; ++current_node_it) {
         cycle.insert(*current_node_it);
