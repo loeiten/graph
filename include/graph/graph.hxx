@@ -48,10 +48,29 @@ class Graph {
   /**
    * Check if a node is a leaf node
    *
+   * Here a leaf node is a node with connection to other nodes
+   *
+   * \see IsLeaf(int cur_node, int prev_node) for non-directed leaf nodes
+   *
    * \param node Node to check
    * \return true if the node is a leaf node
    */
   bool IsLeaf(int node) const;
+
+  /**
+   * Check if a node is a leaf node
+   *
+   * Here there are two ways a node can be a leaf node
+   * 1. The node has no adjacent nodes (happens if the node is
+   *    connected with a directed edge)
+   * 2. The node has one adjacent node, and this node is the
+   *    node just visited
+   *
+   * \param cur_node Node to check
+   * \param prev_node Node just visited
+   * \return true if the node is a leaf node
+   */
+  bool IsLeaf(int cur_node, int prev_node) const;
 
   /**
    * Do a depth first search
@@ -94,10 +113,11 @@ class Graph {
    */
   set<set<int>> GetCycles() const;
 
- private:
+ protected:
   map<int, list<int>>
       adjacency_map; /**< The map of the connectivity of all the nodes */
 
+ private:
   /**
    * The recurser used for DFS
    *

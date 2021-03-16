@@ -1,11 +1,9 @@
 #include "graph/graph.hxx"
 
 #include <algorithm>
-#include <deque>
 #include <iterator>
 #include <set>
 
-using std::back_inserter;
 using std::deque;
 using std::find;
 using std::set;
@@ -27,6 +25,14 @@ const list<int> Graph::GetAdjacencyList(int node) const {
 
 bool Graph::IsLeaf(int node) const {
   if (adjacency_map.find(node) == adjacency_map.end()) {
+    return true;
+  }
+  return false;
+}
+
+bool Graph::IsLeaf(int cur_node, int prev_node) const {
+  if (adjacency_map.find(cur_node) == adjacency_map.end() ||
+      (adjacency_map.at(cur_node) == list<int>{prev_node})) {
     return true;
   }
   return false;
@@ -82,11 +88,11 @@ list<int> Graph::BFS(int from) const {
   list<int> result{from};
   visited_map[from] = true;
   deque<int> bfs_queue;
-  bfs_queue.push_back(from);
+  bfs_queue.push_front(from);
 
   while (!bfs_queue.empty()) {
-    int cur_node = bfs_queue.back();
-    bfs_queue.pop_back();
+    int cur_node = bfs_queue.front();
+    bfs_queue.pop_front();
     // Continue if leaf node
     if (IsLeaf(cur_node)) {
       continue;
@@ -112,30 +118,46 @@ int Graph::Distance(int from, int to) const {
   // NOTE: We add the starting node and mark it as visited
   visited_map[from] = true;
   deque<int> bfs_queue;
-  bfs_queue.push_back(from);
+  bfs_queue.push_front(from);
+
+  // Initialize the prev_node (will be the same as cur_node for the first
+  // iteration)
+  int prev_node = bfs_queue.front();
+  // We will only increase the distance once every node at a breadth has been
+  // popped
+  int increase_distance_after = bfs_queue.front();
 
   while (!bfs_queue.empty()) {
-    int cur_node = bfs_queue.back();
+    int cur_node = bfs_queue.front();
+    bfs_queue.pop_front();
 
     if (cur_node == to) {
       return distance;
     }
 
-    bfs_queue.pop_back();
-    // FIXME: You are here - in digraph a leaf is only pointing back at prev
     // Continue if leaf node
-    if (IsLeaf(cur_node)) {
+    if (IsLeaf(cur_node, prev_node)) {
       continue;
     }
 
     // Increase the distance
-    ++distance;
+    if (cur_node == increase_distance_after) {
+      ++distance;
+      // Mark that we can update increase_distance_after
+      increase_distance_after = -1;
+    }
 
     for (const auto& neighbour_node : adjacency_map.at(cur_node)) {
       if (!visited_map[neighbour_node]) {
         visited_map[neighbour_node] = true;
         bfs_queue.push_back(neighbour_node);
       }
+    }
+    // Update prev_node
+    prev_node = cur_node;
+    // Update increase_distance_after if it's ready to be updated
+    if (increase_distance_after == -1) {
+      increase_distance_after = bfs_queue.back();
     }
   }
   return -1;

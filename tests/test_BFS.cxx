@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(bfs_dag) {
   g.AddDiEdge(2, 6);
   g.AddDiEdge(2, 7);
 
-  BOOST_TEST(g.BFS(0) == (list<int>{0, 1, 2, 5, 6, 7, 3, 4}));
+  BOOST_TEST(g.BFS(0) == (list<int>{0, 1, 2, 3, 4, 5, 6, 7}));
   BOOST_TEST(g.BFS(1) == (list<int>{1, 3, 4}));
   BOOST_TEST(g.BFS(2) == (list<int>{2, 5, 6, 7}));
   BOOST_TEST(g.BFS(3) == (list<int>{3}));
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(bfs_ag) {
   g.AddEdge(2, 6);
   g.AddEdge(2, 7);
 
-  BOOST_TEST(g.BFS(0) == (list<int>{0, 1, 2, 5, 6, 7, 3, 4}));
+  BOOST_TEST(g.BFS(0) == (list<int>{0, 1, 2, 3, 4, 5, 6, 7}));
   BOOST_TEST(g.BFS(1) == (list<int>{1, 0, 3, 4, 2, 5, 6, 7}));
   BOOST_TEST(g.BFS(2) == (list<int>{2, 0, 5, 6, 7, 1, 3, 4}));
   BOOST_TEST(g.BFS(3) == (list<int>{3, 1, 0, 4, 2, 5, 6, 7}));
